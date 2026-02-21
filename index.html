@@ -1,138 +1,133 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Posaradka Profile Picture</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
+  <title>Posaradka Profile Picture</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
 
-<style>
-   body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-  text-align: center;
-  background: url("bg.jpg") no-repeat center center fixed;
-  background-size: cover;
-}
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      font-family: sans-serif;
+      background: url("bg.jpg") no-repeat center center fixed;
+      background-size: cover;
+    }
 
-.controls {
-  margin-top: 20px;
-  margin-bottom: 40px;
-}
+    h2 {
+      margin-top: 20px;
+    }
 
-.btn {
-  display: inline-block;
-  padding: 18px 40px;
-  font-size: 20px;
-  font-weight: bold;
-  border-radius: 12px;
-  cursor: pointer;
-  border: none;
-  margin: 10px;
-}
+    canvas {
+      border: 2px solid #000;
+      margin-top: 20px;
+    }
 
-.upload-btn {
-  background: #ff9800;
-  color: white;
-}
+    .controls {
+      margin-top: 25px;
+      margin-bottom: 40px;
+    }
 
-.download-btn {
-  background: #4CAF50;
-  color: white;
-}
-  
-body{
-  text-align:center;
-  font-family:Arial;
-  background:#f2f2f2;
-}
-canvas{
-  border:2px solid #333;
-  margin-top:20px;
-  max-width:90%;
-}
-button,input{
-  margin:10px;
-  padding:8px 12px;
-}
-</style>
+    .btn {
+      display: inline-block;
+      padding: 18px 40px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      border: none;
+      margin: 10px;
+    }
+
+    .upload-btn {
+      background: #ff9800;
+      color: white;
+    }
+
+    .download-btn {
+      background: #4CAF50;
+      color: white;
+    }
+  </style>
 </head>
 
 <body>
 
 <h2>Posaradka Profile Picture</h2>
 
-
-<br>
-
 <canvas id="canvas" width="1080" height="1080"></canvas>
 
-  <div class="controls">
+<div class="controls">
   <label for="upload" class="btn upload-btn">Upload Photo</label>
   <input type="file" id="upload" accept="image/*" hidden>
-
   <button id="download" class="btn download-btn">Download Image</button>
 </div>
-  
 
 <script>
+  const canvas = new fabric.Canvas('canvas', {
+    preserveObjectStacking: true
+  });
 
-const canvas = new fabric.Canvas('canvas', {
-  preserveObjectStacking: true
-});
+  let userImage;
+  let frameImage;
 
-let userImage;
-let frameImage;
+  // Load Frame
+  fabric.Image.fromURL('posaradka04.png', function(img) {
+    frameImage = img;
+    frameImage.scaleToWidth(1080);
+    frameImage.set({
+      selectable: false,
+      evented: false
+    });
+    canvas.add(frameImage);
+    canvas.bringToFront(frameImage);
+  });
 
-fabric.Image.fromURL('posaradka04.png', function(img) {
-  frameImage = img;
-  frameImage.selectable = false;
-  frameImage.evented = false;
-  frameImage.scaleToWidth(1080);
-  canvas.add(frameImage);
-  canvas.bringToFront(frameImage);
-});
+  // Upload Photo
+  document.getElementById('upload').addEventListener('change', function(e) {
+    const reader = new FileReader();
+    reader.onload = function(f) {
+      fabric.Image.fromURL(f.target.result, function(img) {
 
-// Upload user photo
-document.getElementById('upload').addEventListener('change', function(e){
+        if (userImage) {
+          canvas.remove(userImage);
+        }
 
-    var reader = new FileReader();
+        userImage = img;
 
-    reader.onload = function(event){
-
-        fabric.Image.fromURL(event.target.result, function(img){
-
-            if(userImage){
-                canvas.remove(userImage);
-            }
-
-            userImage = img;
-
-            img.scaleToWidth(1080);
-
-            canvas.insertAt(img, 0); // Behind frame
-
+        img.set({
+          left: 540,
+          top: 540,
+          originX: 'center',
+          originY: 'center',
+          cornerSize: 20
         });
 
+        img.scaleToWidth(800);
+
+        canvas.add(img);
+        canvas.sendToBack(img);
+        canvas.bringToFront(frameImage);
+      });
     };
-
     reader.readAsDataURL(e.target.files[0]);
+  });
 
-});
-
-// Download high-quality PNG
-function downloadImage(){
-
+  // Download Image
+  document.getElementById('download').addEventListener('click', function() {
     canvas.discardActiveObject();
     canvas.renderAll();
 
-    var link = document.createElement('a');
-    link.href = canvas.toDataURL({
-        format: 'png'
+    const dataURL = canvas.toDataURL({
+      format: 'png',
+      quality: 1
     });
-    link.download = "posaradka-profile.png";
+
+    const link = document.createElement('a');
+    link.href = dataURL;
+    link.download = "Posaradka_Profile.png";
     link.click();
-}
+  });
 
 </script>
 
