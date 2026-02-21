@@ -6,6 +6,41 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
 
 <style>
+   body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  text-align: center;
+  background: url("background.jpg") no-repeat center center fixed;
+  background-size: cover;
+}
+
+.controls {
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 18px 40px;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  margin: 10px;
+}
+
+.upload-btn {
+  background: #ff9800;
+  color: white;
+}
+
+.download-btn {
+  background: #4CAF50;
+  color: white;
+}
+  
 body{
   text-align:center;
   font-family:Arial;
@@ -27,27 +62,35 @@ button,input{
 
 <h2>Posaradka Profile Picture</h2>
 
-<input type="file" id="upload" accept="image/*">
-<button onclick="downloadImage()">Download</button>
 
 <br>
 
 <canvas id="canvas" width="1080" height="1080"></canvas>
 
+  <div class="controls">
+  <label for="upload" class="btn upload-btn">Upload Photo</label>
+  <input type="file" id="upload" accept="image/*" hidden>
+
+  <button id="download" class="btn download-btn">Download Image</button>
+</div>
+  
+
 <script>
 
-var canvas = new fabric.Canvas('canvas');
-var frame;
-var userImage;
+const canvas = new fabric.Canvas('canvas', {
+  preserveObjectStacking: true
+});
 
-// Load fixed frame
-fabric.Image.fromURL('posaradka04.png', function(img){
-    frame = img;
-    img.scaleToWidth(1080);
-    img.selectable = false;
-    img.evented = false;
-    canvas.add(img);
-    canvas.bringToFront(img);
+let userImage;
+let frameImage;
+
+fabric.Image.fromURL('posaradka04.png', function(img) {
+  frameImage = img;
+  frameImage.selectable = false;
+  frameImage.evented = false;
+  frameImage.scaleToWidth(1080);
+  canvas.add(frameImage);
+  canvas.bringToFront(frameImage);
 });
 
 // Upload user photo
