@@ -31,7 +31,7 @@
     .btn {
       display: inline-block;
       padding: 30px 70px;
-      font-size: 30px;
+      font-size: 40px;
       font-weight: bold;
       border-radius: 15px;
       cursor: pointer;
@@ -65,11 +65,18 @@
 
 <script>
   const canvas = new fabric.Canvas('canvas', {
-    preserveObjectStacking: true
+    preserveObjectStacking: true,
+    selection: false
   });
+
+  canvas.allowTouchScrolling = false;
 
   let userImage;
   let frameImage;
+
+  // Enable bigger touch controls
+  fabric.Object.prototype.cornerSize = 30;
+  fabric.Object.prototype.transparentCorners = false;
 
   // Load Frame
   fabric.Image.fromURL('posaradka04.png', function(img) {
@@ -99,8 +106,7 @@
           left: 540,
           top: 540,
           originX: 'center',
-          originY: 'center',
-          cornerSize: 20
+          originY: 'center'
         });
 
         img.scaleToWidth(800);
@@ -108,12 +114,26 @@
         canvas.add(img);
         canvas.sendToBack(img);
         canvas.bringToFront(frameImage);
+
+        canvas.setActiveObject(img);
       });
     };
     reader.readAsDataURL(e.target.files[0]);
   });
 
-  // Download Image
+  // Enable Pinch Zoom
+  canvas.on('touch:gesture', function(opt) {
+    if (opt.e.touches && opt.e.touches.length === 2) {
+      const activeObj = canvas.getActiveObject();
+      if (activeObj) {
+        const scale = activeObj.scaleX * opt.self.scale;
+        activeObj.scale(scale);
+        canvas.renderAll();
+      }
+    }
+  });
+
+  // Download
   document.getElementById('download').addEventListener('click', function() {
     canvas.discardActiveObject();
     canvas.renderAll();
