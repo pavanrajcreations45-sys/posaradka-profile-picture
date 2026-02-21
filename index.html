@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Posaradka Profile Picture</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
+
+<style>
+body{
+  text-align:center;
+  font-family:Arial;
+  background:#f2f2f2;
+}
+canvas{
+  border:2px solid #333;
+  margin-top:20px;
+  max-width:90%;
+}
+button,input{
+  margin:10px;
+  padding:8px 12px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Posaradka Profile Picture</h2>
+
+<input type="file" id="upload" accept="image/*">
+<button onclick="downloadImage()">Download</button>
+
+<br>
+
+<canvas id="canvas" width="1080" height="1080"></canvas>
+
+<script>
+
+var canvas = new fabric.Canvas('canvas');
+var frame;
+var userImage;
+
+// Load fixed frame
+fabric.Image.fromURL('posaradka04.png', function(img){
+    frame = img;
+    img.scaleToWidth(1080);
+    img.selectable = false;
+    img.evented = false;
+    canvas.add(img);
+    canvas.bringToFront(img);
+});
+
+// Upload user photo
+document.getElementById('upload').addEventListener('change', function(e){
+
+    var reader = new FileReader();
+
+    reader.onload = function(event){
+
+        fabric.Image.fromURL(event.target.result, function(img){
+
+            if(userImage){
+                canvas.remove(userImage);
+            }
+
+            userImage = img;
+
+            img.scaleToWidth(1080);
+
+            canvas.insertAt(img, 0); // Behind frame
+
+        });
+
+    };
+
+    reader.readAsDataURL(e.target.files[0]);
+
+});
+
+// Download high-quality PNG
+function downloadImage(){
+
+    canvas.discardActiveObject();
+    canvas.renderAll();
+
+    var link = document.createElement('a');
+    link.href = canvas.toDataURL({
+        format: 'png'
+    });
+    link.download = "posaradka-profile.png";
+    link.click();
+}
+
+</script>
+
+</body>
+</html>
